@@ -10,31 +10,22 @@ time_start = time.time()
 with open("materials/POSData/training-full.pos") as f_train:
   hmm = HMM(f_train)
 
-# with open("materials/POSData/debug-trans.out", 'w') as trans_out:
-#   hmm.transition.output_to_file(trans_out)
-#
-# with open("materials/POSData/debug-like.out", 'w') as like_out:
-#   hmm.likelihood.output_to_file(like_out)
-
 # read in test file and output a tagged corpus to test_out
 with open("materials/POSData/test.text") as test_in:
   with open("materials/POSData/shannon-li-test.pos", 'w') as test_out:
     sentence = []
-    # c = 1
     for word in test_in:  # words are line-delimited
       if word != '\n':
         sentence.append(word[:-1])  # don't include the '\n' at the end of each word
       else:  # we have reached the end of a "sentence"
         # convert the words to lowercase before running viterbi on it 
         tag_sequence = hmm.run_viterbi([word.lower() for word in sentence])
-        # output result into file "development-shannon-li.pos"
+        # write result into output file 
         for w in range(len(sentence)):
           line = sentence[w] + '\t' + tag_sequence[w] + '\n'
           test_out.write(line)
         test_out.write('\n')
         sentence = []
-        # print(c)
-      # c += 1
 print("Finished. Total time elapsed:{} seconds".format(time.time()-time_start))
 
 

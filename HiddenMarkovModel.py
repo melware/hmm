@@ -10,7 +10,6 @@ class HMM_Table:
 
   def get(self, pos, word, word_list):
     if word not in word_list:
-      # print("could not find word:{} as pos:{}".format(word, pos))
       # TODO better way of tagging unknown words
       self.matrix[pos][word] = min(self.matrix[pos].values())
 
@@ -155,10 +154,8 @@ class HMM:
 
     # populate the viterbi and backpointer tables
     for word in range(2, len(sentence)-1):
-      # print("testing for {}. word#{}:{}".format(word,w,self.words[w]))
       for p in range(1, len(viterbi)-1):
         cur_likelihood = self.likelihood.get(self.states[p], sentence[word], self.words)
-        # print("p:{}; w:{}; likelihood:{}".format(self.states[p], self.words[w], cur_likelihood))
         max_result = 0
         max_prev = 1
         for prev in range(1, len(viterbi)-1):
@@ -166,7 +163,6 @@ class HMM:
           if result > max_result:
             max_result = result
             max_prev = prev
-        # print("inserting {} into viterbi[{}][{}]".format(max_result,p,word))
         backpointer[p][word] = max_prev
         viterbi[p][word] = max_result
 
@@ -180,58 +176,12 @@ class HMM:
       if result > max_result:
         max_result = result
         last_pos = p
-    # print("last_pos for {} = {}".format(sentence[lw], self.states[last_pos]))
     backpointer[e][lw+1] = last_pos
     viterbi[e][lw+1] = max_result
 
     tag_seq = [self.states[last_pos]]
     for w in range(lw, 1, -1):  # from last word to first word
-      # print("w:{}; last_pos:{}".format(w,last_pos))
       last_pos = backpointer[last_pos][w]
       tag_seq.insert(0, self.states[last_pos])
     
     return tag_seq
-#
-#  def print_backpointer(self, backpointer):
-#    for i in range(len(backpointer)):
-#      print(self.states[i] + ':\t\t', end="")
-#      for j in range(len(backpointer[i])):
-#        print('{}\t'.format(self.states[backpointer[i][j]]), end="")
-#      print()
-#
-#    print()
-#
-#
-#  def print_viterbi(self, viterbi):
-#    for i in range(len(viterbi)):
-#      print(self.states[i] + ':\t\t', end="")
-#      for j in range(len(viterbi[i])):
-#        print('{}\t'.format(viterbi[i][j]), end="")
-#      print()
-#
-#    print()
-#
-
-      
-    
-
-
-
-
-#
-#    # calculate the most likely tag for the last word
-#    lw = len(sentence)-1  # index of the last word
-#
-#    last_tag = max(viterbi[lw].keys(), key=(lambda k: viterbi[lw][k]*self.transition.get(k, END_TAG)))
-#
-#    tag_sequence = [last_tag]
-#    # follow backpointer to output a most likely tag sequence
-#    for w in range(len(sentence)-1, 0, -1):
-#      last_tag = backpointer[w][last_tag]
-#      # print(last_tag+' ')
-#      tag_sequence.insert(0, last_tag)
-#
-#    # print('\n')
-#    # print("tag:{}\nsentence:{}".format(tag_sequence, sentence))
-#    return tag_sequence
-  
